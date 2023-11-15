@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ShoeSon</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="default_web_client_id">597835522297-dlj1ggenshu8fcao7nfjjjbi8vc4vil9.apps.googleusercontent.com</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+</resources>
