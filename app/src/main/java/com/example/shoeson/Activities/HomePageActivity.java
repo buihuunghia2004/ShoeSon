@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.shoeson.Activities.CartAndOrder.CheckoutActivity;
 import com.example.shoeson.Activities.ToUpWallet.RechargeActivity;
 import com.example.shoeson.Activities.VerifyAccount.LoginOrRegisterActivity;
 import com.example.shoeson.FirebaseDatabase.MyFDB;
@@ -95,12 +96,11 @@ public class HomePageActivity extends AppCompatActivity {
                     fragmentTransaction.commit();
                 }else if (id==id_item_cart){
                     cartFragment=CartFragment.getInstance(user);
-                    cartFragment.getData();
                     fragmentTransaction.replace(binding.frameMain.getId(),cartFragment);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
                 }else if (id==id_item_order){
-
+                    //ordersFrament=OrdersFragment.newInstance();
                     fragmentTransaction.replace(binding.frameMain.getId(),ordersFrament);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
@@ -209,10 +209,10 @@ public class HomePageActivity extends AppCompatActivity {
     }
 
     //chuyển activity
-    public void toShoesDetailsActivity(int position){
+    public void toShoesDetailsActivity(Shoes shoes){
         Intent intent=new Intent(this, ShoesDetailsActivity.class);
         Bundle bundle=new Bundle();
-        bundle.putSerializable("shoes",listShoes.get(position));
+        bundle.putSerializable("shoes",shoes);
         bundle.putSerializable("user",user);
         intent.putExtras(bundle);
         startActivity(intent);
@@ -228,11 +228,28 @@ public class HomePageActivity extends AppCompatActivity {
         startActivity(intent);
         finishAffinity();
     }
+    public void toCheckOutActivity(Orders orders,User user){
+        Intent intent=new Intent(this, CheckoutActivity.class);
+        intent.putExtra("order",orders);
+        intent.putExtra("user",user);
+        startActivity(intent);
+    }
     //fragment Cart
     public void setQuantityShoesCart(int position, int quantity){
         ShoesCart newShoesCart=user.getListShoesCarts().get(position);
         newShoesCart.setQuantity(quantity);
         user.setSize(position,newShoesCart);
+    }
+    public void removeShoesCart(int position){
+        ArrayList<ShoesCart> list=user.getListShoesCarts();
+        list.remove(position);
+        MyFDB.UsersFDB.addCartUser(user.getId(), list, new MyFDB.IAddCallBack() {
+            @Override
+            public void onSuccess(boolean b) {
+                Log.d(">>>>", "onSuccess: xóa item shoeCart thành công");
+                user.setListShoesCarts(list);
+            }
+        });
     }
     public void addOrder(Orders orders){
         MyFDB.OrderFDB.addOrder(orders, new MyFDB.IAddCallBack() {
@@ -251,16 +268,4 @@ public class HomePageActivity extends AppCompatActivity {
 
     //fragment Order
 
-
-    public void removeShoesCart(int position){
-        ArrayList<ShoesCart> list=user.getListShoesCarts();
-        list.remove(position);
-        MyFDB.UsersFDB.addCartUser(user.getId(), list, new MyFDB.IAddCallBack() {
-            @Override
-            public void onSuccess(boolean b) {
-                Log.d(">>>>", "onSuccess: xóa item shoeCart thành công");
-
-            }
-        });
-    }
 }

@@ -5,14 +5,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.bumptech.glide.Glide;
+import com.example.shoeson.Interfaces.ISetBrandAdapter;
 import com.example.shoeson.Model.Brand;
-import com.example.shoeson.Model.Shoes;
-import com.example.shoeson.R;
 import com.example.shoeson.databinding.ItemBrandBinding;
 
 import java.util.List;
 
 public class GridBrandAdapter extends BaseAdapter {
+    ISetBrandAdapter iSetBrandAdapter;
+
+    public void ISetBrandAdapterListener(ISetBrandAdapter iSetBrandAdapter) {
+        this.iSetBrandAdapter = iSetBrandAdapter;
+    }
+
     private List<Brand> listBrand;
 
     public GridBrandAdapter(List<Brand> listBrand) {
@@ -42,8 +48,15 @@ public class GridBrandAdapter extends BaseAdapter {
         }
 
         Brand brand=listBrand.get(position);
-        binding.imgLogo.setImageResource(R.drawable.logos1);
+        Glide.with(parent.getContext()).load(brand.getLinkLogo()).into(binding.imgLogo);
         binding.tvName.setText(brand.getName());
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iSetBrandAdapter.setBrandApter(brand.getId());
+            }
+        });
         return convertView;
     }
 }

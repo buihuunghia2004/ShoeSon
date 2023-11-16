@@ -46,7 +46,7 @@ public class ShoesHomeAdapter extends RecyclerView.Adapter<ShoesHomeAdapter.View
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((HomePageActivity) context).toShoesDetailsActivity(position);
+                ((HomePageActivity) context).toShoesDetailsActivity(shoes);
             }
         });
     }

@@ -88,17 +88,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <TextView
-                        android:text="Most popular"
+                        android:text="Phổ biến"
                         android:textColor="@color/black"
-                        android:textSize="20dp"
+                        android:textSize="18dp"
                         android:textStyle="bold"
                         android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"/>
                     <TextView
+                        android:id="@+id/tvSeeAll"
                         android:text="See All"
                         android:textColor="@color/black"
-                        android:textSize="20dp"
+                        android:textSize="18dp"
                         android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
@@ -116,11 +117,15 @@
     </LinearLayout>
 
     <com.google.android.material.search.SearchView
+        android:id="@+id/sv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:backgroundTint="@color/box"
         android:hint="search"
         app:layout_anchor="@id/search_bar">
-        <!-- Search suggestions/results go here (ScrollView, RecyclerView, etc.). -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvResult"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </com.google.android.material.search.SearchView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -46,7 +46,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         holder.binding.btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CartFragment cartFragment=new CartFragment();
+                ((HomePageActivity) context).removeShoesCart(holder.getAdapterPosition());
+
+                list.remove(holder.getAdapterPosition());
+                notifyDataSetChanged();
             }
         });
         holder.binding.btnReduce.setOnClickListener(new View.OnClickListener() {

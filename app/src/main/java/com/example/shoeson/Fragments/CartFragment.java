@@ -41,6 +41,7 @@ public class CartFragment extends Fragment {
     CartAdapter adapter;
     int totalMoney;
     AlertDialog.Builder builder;
+    AlertDialog.Builder builderAddAddress;
     User user;
     Orders orders;
     FragmentCartBinding binding;
@@ -61,17 +62,19 @@ public class CartFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        list=new ArrayList<>();
         getData();
+
         adapter=new CartAdapter(list);
         builder=new AlertDialog.Builder(getContext());
-
+        builderAddAddress=new AlertDialog.Builder(getContext());
+        Log.d("LLLLL", "getInstance: 1");
         orders=new Orders();
         orders.setIdUser(user.getId());
         orders.setNameUser(user.getName());
         orders.setAddress(user.getAddress());
         orders.setPhoneNumber(user.getPhoneNumber());
         orders.setListShoesCarts(list);
-
     }
 
     @Override
@@ -91,14 +94,14 @@ public class CartFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getData();
+
         binding.btnTopUp.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 orders.setOrderTime(EpochTime.getEpochTime());
-                showDialog(orders);
+                ((HomePageActivity) getContext()).toCheckOutActivity(orders,user);
             }
-
         });
     }
     private void setTotalMoney(){
@@ -108,11 +111,11 @@ public class CartFragment extends Fragment {
                 totalMoney+=shoesCart.getPriceSell()*shoesCart.getQuantity();
             }
         }
-
+        adapter.notifyDataSetChanged();
         binding.tvTotalMoney.setText(totalMoney+" VNĐ");
     }
     private void showDialog(Orders orders){
-        builder.setTitle("title");
+        builder.setTitle("Xác nhận mua hàng");
         builder.setMessage("message");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
@@ -135,11 +138,15 @@ public class CartFragment extends Fragment {
         if (getArguments() != null) {
             user = (User) getArguments().getSerializable("user");
             if (user != null){
-                list=user.getListShoesCarts();
+                list.clear();
+                list.addAll(user.getListShoesCarts());
+                Log.d("LLLLL", "getData: "+list.size());
                 if (adapter == null){
                     adapter=new CartAdapter(list);
+                    Log.d("LLLLL", "getData: null");
                 }else{
                     adapter.notifyDataSetChanged();
+                    Log.d("LLLLL", "getData: not");
                 }
             }
         }

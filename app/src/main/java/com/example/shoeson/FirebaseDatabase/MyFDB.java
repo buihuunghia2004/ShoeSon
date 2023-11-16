@@ -198,6 +198,16 @@ public class MyFDB {
                 }
             });
         }
+        public static void updateAddress(String uid,String address,IAddCallBack callBack){
+            HashMap<String,Object> map=new HashMap<>();
+            map.put("address",address);
+            crUser.document(uid).update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    callBack.onSuccess(true);
+                }
+            });
+        }
     }
     public static class OrderFDB
     {
