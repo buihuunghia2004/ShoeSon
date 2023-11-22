@@ -47,18 +47,20 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
 
         switch (type){
             case TYPE_1:
-                holder.binding.btn.setText("t1");
+                holder.binding.btnOptions.setText("Chi tiết");
                 break;
-            case TYPE_2:break;
+            case TYPE_2:
+                holder.binding.btnOptions.setText("Mua lại");
+                break;
             case TYPE_3:break;
             case TYPE_4:break;
         }
-        holder.binding.btn.setOnClickListener(new View.OnClickListener() {
+        holder.binding.btnOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (type){
                     case TYPE_1:
-                        holder.binding.btn.setText("t1");
+
                         break;
                     case TYPE_2:break;
                     case TYPE_3:break;

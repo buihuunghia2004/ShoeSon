@@ -1,6 +1,7 @@
 package com.example.shoeson.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -31,6 +32,10 @@ import com.example.shoeson.Model.User;
 import com.example.shoeson.R;
 import com.example.shoeson.databinding.ActivityHomePageBinding;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -38,14 +43,19 @@ public class HomePageActivity extends AppCompatActivity {
     //fragment home page
     ArrayList<Shoes> listShoes;
     ArrayList<Brand> listBrand;
+    ArrayList<Orders> listOrders;
     //User
     User user;
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
-    Fragment homeFragemt,ordersFrament,walletFragment,profileFragment;
+    Fragment homeFragemt,walletFragment,profileFragment;
+    OrdersFragment ordersFragment;
     CartFragment cartFragment;
     //process dialog
     ProgressDialog progressDialog;
+    //listenner
+    EventListener<DocumentSnapshot> userListener;
+    EventListener<QuerySnapshot> orderListener;
     ActivityHomePageBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,22 +73,37 @@ public class HomePageActivity extends AppCompatActivity {
 
         listShoes=new ArrayList<>();
         listBrand=new ArrayList<>();
+        listOrders=new ArrayList<>();
 
-        ordersFrament=OrdersFragment.newInstance(user.getListShoesCarts());
+        ordersFragment=OrdersFragment.newInstance(listOrders);
         walletFragment=WalletFragment.newInstance(user);
         profileFragment=ProfileFragment.newInstance(user);
 
         progressDialog=new ProgressDialog(this);
 
         upLoadDataFirst();
+
+        //listener
+        userListener=new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                user=value.toObject(User.class);
+            }
+        };
+        orderListener=new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+
+            }
+        };
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        upLoadShoesData();
-        upLoadBrandData();
-        upLoadUserData();
+        //upLoadShoesData();
+        //upLoadBrandData();
+        //upLoadUserData();
         binding.bottomNavigation.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -100,8 +125,8 @@ public class HomePageActivity extends AppCompatActivity {
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
                 }else if (id==id_item_order){
-                    //ordersFrament=OrdersFragment.newInstance();
-                    fragmentTransaction.replace(binding.frameMain.getId(),ordersFrament);
+                    ordersFragment=OrdersFragment.newInstance(listOrders);
+                    fragmentTransaction.replace(binding.frameMain.getId(),ordersFragment);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
                 }else if (id==id_item_wallet){
@@ -114,6 +139,28 @@ public class HomePageActivity extends AppCompatActivity {
                     fragmentTransaction.commit();
                 }
                 return true;
+            }
+        });
+
+        //lắng nghe thay đổi
+        progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                MyFDB.UsersFDB.crUser.document(user.getId()).addSnapshotListener(userListener);
+                for (int i=0;i<listOrders.size();i++){
+                    int finalI = i;
+                    Log.d(">>>>>", "onResume: "+listOrders.get(i).getId());
+                    MyFDB.OrderFDB.crOrder.document(listOrders.get(i).getId()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                            Orders orders=value.toObject(Orders.class);
+                            listOrders.set(finalI,orders);
+                            Log.d("LLLL", "onEvent: "+listOrders.size());
+                            ordersFragment=OrdersFragment.newInstance(listOrders);
+                            ordersFragment.updateData();
+                        }
+                    });
+                }
             }
         });
     }
@@ -131,16 +178,12 @@ public class HomePageActivity extends AppCompatActivity {
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(binding.frameMain.getId(),homeFragemt);
                 fragmentTransaction.commit();
-
-
-                progressDialog.dismiss();
             }
             @Override
             public void onFailure(String errorMesage) {
 
             }
         });
-
         MyFDB.BrandFDB.getAllBrand(new MyFDB.IGetAllObjectCallBack() {
             @Override
             public void onSuccess(ArrayList<Object> list) {
@@ -154,52 +197,29 @@ public class HomePageActivity extends AppCompatActivity {
 
             }
         });
-    }
-    private void upLoadShoesData(){
-        showProcessDialog();
-        MyFDB.ShoeFDB.getAllShoes(new MyFDB.ShoeFDB.IGetShoesCallBack() {
-            @Override
-            public void onSuccess(ArrayList<Shoes> list) {
-                listShoes.clear();
-                listShoes.addAll(list);
-
-            }
-            @Override
-            public void onFailure(String errorMesage) {
-            }
-        });
-    }
-    private void upLoadBrandData(){
-        showProcessDialog();
-        MyFDB.BrandFDB.getAllBrand(new MyFDB.IGetAllObjectCallBack() {
-            @Override
-            public void onSuccess(ArrayList<Object> list) {
-                listBrand.clear();
-                for (Object object:list){
-                    listBrand.add((Brand) object);
-                }
-                Toast.makeText(HomePageActivity.this, "ok", Toast.LENGTH_SHORT).show();
-                progressDialog.dismiss();
-            }
-            @Override
-            public void onFailure(String errorMesage) {
-
-            }
-        });
-    }
-    public void upLoadUserData(){
-        showProcessDialog();
         MyFDB.UsersFDB.getUserByUid(user.getId(), new MyFDB.IGetUserByUid(){
             @Override
             public void onSuccess(User users) {
                 user=users;
-                progressDialog.dismiss();
+                MyFDB.OrderFDB.getAllOrdersById(user.getId(), new MyFDB.OrderFDB.IGetAllOrder() {
+                    @Override
+                    public void onSuccess(ArrayList<Orders> list) {
+                        listOrders.clear();
+                        listOrders.addAll(list);
+                        progressDialog.dismiss();
+                    }
+                    @Override
+                    public void onFailure(String erorrMessage) {
+
+                    }
+                });
             }
             @Override
             public void onFailure(String errorMessage) {
 
             }
         });
+
     }
     private void showProcessDialog()
     {
@@ -223,11 +243,7 @@ public class HomePageActivity extends AppCompatActivity {
         intent.putExtra("user",user);
         startActivity(intent);
     }
-    public void toLoginOrRegisterActivity(){
-        Intent intent=new Intent(HomePageActivity.this, LoginOrRegisterActivity.class);
-        startActivity(intent);
-        finishAffinity();
-    }
+
     public void toCheckOutActivity(Orders orders,User user){
         Intent intent=new Intent(this, CheckoutActivity.class);
         intent.putExtra("order",orders);
@@ -252,9 +268,9 @@ public class HomePageActivity extends AppCompatActivity {
         });
     }
     public void addOrder(Orders orders){
-        MyFDB.OrderFDB.addOrder(orders, new MyFDB.IAddCallBack() {
+        MyFDB.OrderFDB.addOrder(orders, new MyFDB.OrderFDB.IAddOrder() {
             @Override
-            public void onSuccess(boolean b) {
+            public void onSuccess(String id) {
                 //Xóa danh sách trong giỏ hàng
                 MyFDB.UsersFDB.addCartUser(user.getId(), new ArrayList<ShoesCart>(), new MyFDB.IAddCallBack() {
                     @Override
@@ -263,9 +279,24 @@ public class HomePageActivity extends AppCompatActivity {
                     }
                 });
             }
+
+            @Override
+            public void onFailure(String erorrMessage) {
+
+            }
         });
     }
-
     //fragment Order
 
+    //fragment Profile
+    public void toLoginOrRegisterActivity(){
+        Intent intent=new Intent(HomePageActivity.this, LoginOrRegisterActivity.class);
+        startActivity(intent);
+        finishAffinity();
+    }
+    public void toChatWithShopActivity(){
+        Intent intent=new Intent(this, ChatActivity.class);
+        intent.putExtra("user",user);
+        startActivity(intent);
+    }
 }

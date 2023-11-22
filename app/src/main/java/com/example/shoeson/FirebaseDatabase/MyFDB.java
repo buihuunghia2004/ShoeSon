@@ -3,6 +3,7 @@ package com.example.shoeson.FirebaseDatabase;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.shoeson.Model.Brand;
 import com.example.shoeson.Model.Orders;
@@ -17,7 +18,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -133,10 +137,9 @@ public class MyFDB {
                     });
         }
     }
-
     public static class UsersFDB
     {
-        private static CollectionReference crUser = db.collection("users");
+        public static CollectionReference crUser = db.collection("users");
 
         public static void addUser(User user, IAddCallBack callBack){
             // Add a new document with a generated ID]
@@ -211,10 +214,10 @@ public class MyFDB {
     }
     public static class OrderFDB
     {
-        private static CollectionReference crOrder = db.collection("orders");
+        public static CollectionReference crOrder = db.collection("orders");
 
-        public static void addOrder(Orders orders, IAddCallBack callBack){
-            // Add a new document with a generated ID]
+        public static void addOrder(Orders orders, IAddOrder callBack){
+
             DocumentReference documentReference=crOrder.document();
             orders.setId(documentReference.getId());
             documentReference
@@ -222,27 +225,71 @@ public class MyFDB {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            callBack.onSuccess(true);
+                            callBack.onSuccess(documentReference.getId());
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            callBack.onSuccess(false);
+                            callBack.onSuccess(e.getMessage());
                         }
                     });
         }
 
-        public static void getAllShoes(final ShoeFDB.IGetShoesCallBack callback) {
+        public static void getAllOrders(final IGetAllOrder callback) {
             // Lấy dữ liệu từ Firebase Realtime Database
             crOrder.get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            ArrayList<Orders> listOrder=new ArrayList<>();
+                            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                Orders orders = document.toObject(Orders.class);
+                                listOrder.add(orders);
+                            }
+                            callback.onSuccess(listOrder);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            callback.onFailure(e.getMessage());
+                        }
+                    });
 
+        }
+        public static void getAllOrdersById(String uid,final IGetAllOrder callback) {
+            Query query = crOrder.whereEqualTo("idUser", uid);
+            query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            ArrayList<Orders> listOrder=new ArrayList<>();
+                            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                Orders orders = document.toObject(Orders.class);
+                                listOrder.add(orders);
+                            }
+                            callback.onSuccess(listOrder);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            callback.onFailure(e.getMessage());
                         }
                     });
         }
+        public interface IAddOrder{
+            void onSuccess(String id);
+            void onFailure(String erorrMessage);
+        }
+        public interface IGetAllOrder{
+            void onSuccess(ArrayList<Orders> list);
+            void onFailure(String erorrMessage);
+        }
+    }
+
+    public static class ChatsFDB
+    {
+        public static CollectionReference crChats = db.collection("chats");
+
     }
 
     public interface IGetUserByUid{

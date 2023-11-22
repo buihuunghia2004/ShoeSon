@@ -117,7 +117,17 @@ public class Orders implements Serializable {
         return status;
     }
 
-    public void setStatus(long statusTime) {
-        this.status = statusTime;
+    public void setStatus(long status) {
+        this.status = status;
+    }
+
+    public int getPriceOfOrder(){
+        int total=0;
+
+        for (ShoesCart shoesCart:listShoesCarts){
+            total+=shoesCart.getPriceSell()*shoesCart.getQuantity();
+        }
+
+        return total;
     }
 }

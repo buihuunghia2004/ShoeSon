@@ -67,5 +67,11 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        binding.chatWithShop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((HomePageActivity) getContext()).toChatWithShopActivity();
+            }
+        });
     }
 }

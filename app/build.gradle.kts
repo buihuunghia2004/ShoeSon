@@ -42,8 +42,10 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:22.2.0")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.google.firebase:firebase-database:20.3.0")
-    implementation(fileTree(mapOf("dir" to "/home/nghiajr/zalopay", "include" to listOf("*.aar", "*.jar"), "exclude" to ArrayList<java.util.Objects>())))
+
     implementation ("com.squareup.okhttp3:okhttp:4.6.0")
+    implementation(fileTree(mapOf("dir" to "/home/nghiajr/zalopay/", "include" to listOf("*.aar", "*.jar"), "exclude" to listOf(""))))
+    implementation("com.google.firebase:firebase-messaging:23.3.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -26,6 +27,9 @@ import com.example.shoeson.Model.User;
 import com.example.shoeson.R;
 import com.example.shoeson.databinding.FragmentCartBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -35,6 +39,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class CartFragment extends Fragment {
     private ArrayList<ShoesCart> list;
@@ -75,6 +80,7 @@ public class CartFragment extends Fragment {
         orders.setAddress(user.getAddress());
         orders.setPhoneNumber(user.getPhoneNumber());
         orders.setListShoesCarts(list);
+        orders.setStatus(1);
     }
 
     @Override
@@ -94,7 +100,6 @@ public class CartFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getData();
-
         binding.btnTopUp.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -140,13 +145,10 @@ public class CartFragment extends Fragment {
             if (user != null){
                 list.clear();
                 list.addAll(user.getListShoesCarts());
-                Log.d("LLLLL", "getData: "+list.size());
                 if (adapter == null){
                     adapter=new CartAdapter(list);
-                    Log.d("LLLLL", "getData: null");
                 }else{
                     adapter.notifyDataSetChanged();
-                    Log.d("LLLLL", "getData: not");
                 }
             }
         }

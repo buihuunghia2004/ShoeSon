@@ -89,7 +89,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
             <Button
-                android:id="@+id/btn"
+                android:id="@+id/btnOptions"
                 android:text="title"
                 android:backgroundTint="@color/black"
                 android:layout_width="100dp"

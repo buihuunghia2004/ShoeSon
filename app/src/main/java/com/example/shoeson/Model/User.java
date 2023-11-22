@@ -22,6 +22,8 @@ public class User implements Serializable {
     public User(String id,boolean profile) {
         this.id = id;
         this.profile=profile;
+        this.listShoesCarts=new ArrayList<>();
+        this.listIdOrder=new ArrayList<>();
     }
 
     public User(String id, boolean profile, String name, String linkImg, String phoneNumber, String address, int money,String pin, ArrayList<ShoesCart> listShoesCarts) {

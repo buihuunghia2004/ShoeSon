@@ -2,15 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET "/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE "/>
+    <uses-permission android:name="android.permission.INTERNET " />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE " />
 
     <queries>
-        <package android:name="vn.com.vng.zalopay"/>
-        <package android:name="vn.com.vng.zalopay.sbmc"/>
+        <package android:name="vn.com.vng.zalopay" />
+        <package android:name="vn.com.vng.zalopay.sbmc" />
     </queries>
 
+
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -20,6 +22,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ShoeSon"
         tools:targetApi="31">
+
+        <service
+            android:name=".FCM.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name=".Activities.ChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.CartAndOrder.PaymentMethodActivity"
+            android:exported="false" />
         <activity
             android:name=".Activities.AddressActivity"
             android:exported="false" />
@@ -58,23 +75,29 @@
             android:exported="true" />
         <activity
             android:name=".Activities.Intro.SplashScreenActivity"
-            android:launchMode="singleTask"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="demozpk" android:host="app"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="app"
+                    android:scheme="demozpk" />
             </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="true" />
+            android:exported="true">
+
+        </activity>
     </application>
 
 </manifest>

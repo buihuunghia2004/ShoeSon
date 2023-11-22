@@ -39,7 +39,10 @@ public class RechargeActivity extends AppCompatActivity {
                 int money=Integer.parseInt(binding.edtInputMoney.getText().toString());
                 user.setMoney(user.getMoney()+money);
                 Intent intent=new Intent(RechargeActivity.this,EnterPINActivity.class);
-                intent.putExtra("user",user);
+                Bundle bundle=new Bundle();
+                bundle.putSerializable("user",user);
+                bundle.putInt("type",0);
+                intent.putExtras(bundle);
                 startActivity(intent);
                 finish();
             }

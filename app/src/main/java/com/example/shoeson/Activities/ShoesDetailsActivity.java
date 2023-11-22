@@ -100,7 +100,6 @@ public class ShoesDetailsActivity extends AppCompatActivity {
             }
         });
 
-
         biding.btnAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

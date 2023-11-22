@@ -53,14 +53,18 @@ public class HomePageFragment extends Fragment {
     User user;
     Context context;
     FragmentHomePageBinding binding;
+
+    private static HomePageFragment instance;
     public static HomePageFragment newInstance(ArrayList<Shoes> listShoes, ArrayList<Brand> listBrand, User user) {
-        HomePageFragment fragment = new HomePageFragment();
+        if (instance == null){
+            instance=new HomePageFragment();
+        }
         Bundle args = new Bundle();
         args.putSerializable("listshoes",listShoes);
         args.putSerializable("listbrand",listBrand);
         args.putSerializable("user",user);
-        fragment.setArguments(args);
-        return fragment;
+        instance.setArguments(args);
+        return instance;
     }
 
     @Override
@@ -72,8 +76,6 @@ public class HomePageFragment extends Fragment {
             listBrand= (List<Brand>) getArguments().getSerializable("listbrand");
             listShoe= (ArrayList<Shoes>) getArguments().getSerializable("listshoes");
             user= (User) getArguments().getSerializable("user");
-            Log.d(">>>>>", "onCreate: "+user.getId());
-            Log.d(">>>>>", "onCreate: "+user.getName());
         }else{
             listShoe=new ArrayList<>();
             listBrand=new ArrayList<>();

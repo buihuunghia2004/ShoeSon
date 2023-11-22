@@ -69,7 +69,10 @@ public class CheckoutActivity extends AppCompatActivity {
         binding.btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent=new Intent(CheckoutActivity.this, PaymentMethodActivity.class);
+                intent.putExtra("user",user);
+                intent.putExtra("order",orders);
+                startActivity(intent);
             }
         });
     }
